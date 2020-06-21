@@ -1,0 +1,740 @@
+<!-- Hällò! -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Aguarde...</title>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="icon" href="img/logoIco.ico">
+		<script type='text/javascript' src='js/external/jquery.min.js'></script>
+  		<script type="text/javascript" src="js/external/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/design.js"></script>
+		<script type="text/javascript" src="js/player.js"></script>
+		<script type="text/javascript" src="js/browser.js"></script>
+		<script type="text/javascript" src="js/settings.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+		<script type="text/javascript">
+			window.onload = function(){
+				MDK_load();
+			}
+		</script>
+	</head>
+	<body id="bo">
+		<div id="scripts">
+			<!-- Espaço para ser substituído -->
+		</div>
+		<center>
+			<!-- tela de loading -->
+			<div id="loadingDiv" class="loaDiv">
+				<img src="img/logo.png"><br/>
+				<b>...Carregando...</b><br/>
+				<div id="bootProgressBar" class="bootProgressBar"></div>
+				<font class="subTitle" id="loadLabel"></font>
+			</div>
+			<!-- app -->
+			<div id="app" class="app">
+				<!-- musica atual -->
+				<div id="currentTrack" style="z-index: 10;" class="divComum">
+					<p align="left" class="pe">
+						<font class="subTitle"> 
+							<font id="time"></font> - Track Atual: <font id="currentId">Nenhuma Música Foi Selecionada</font></font><br/>
+						<font id="textCurrentTrack" class="currentTrack">Nenhuma Música Foi Selecionada</font>
+					</p>
+					<!-- Primeira Faixa -->
+					<div id="playerA">
+						<input type="button" id="idBtnPlayerA" disabled="disabled" value="A" class="largeBtnFade">
+						<audio class="principalAudio" onvolumechange="updateVolumeRange(1);" controls loop id="audioCurrentTrack"></audio>
+						<!-- Volume da 1º Faixa-->
+						<div class="transVolume">
+							<font class="subTitle">Volume: <font class="transText" id="audioVolumeLabel1">0</font></font>
+							<input type="range" class="volumeSlider" oninput="changeTrackVolume(0);" id="currentTrackVolume" step="0.01" min="0" max="1" value="0">
+						</div><br/>
+					</div>
+					<!-- Segunda Faixa -->
+					<div id="playerB" style="display: none;">
+						<input type="button" id="idBtnPlayerB" disabled="disabled" value="B" class="largeBtnFade">
+						<audio class="secondAudio principalAudio" onvolumechange="updateVolumeRange(2);" controls loop id="secondAudioCurrentTrack"></audio>
+						<!-- Volume da 2º Faixa -->
+						<div class="transVolume">
+							<font class="subTitle">Volume: <font class="transText" id="audioVolumeLabel2">0</font></font>
+							<input type="range" class="volumeSlider" oninput="changeTrackVolume(1);" id="secondCurrentTrackVolume" step="0.01" min="0" max="1" value="0">
+						</div>
+						</div>
+				</div>
+				<!-- 2º Menu de configs Botões // Refactor -->
+				<div id="tracksConfig" class="tracksConfigs">
+					<!-- Select Set -->
+					<div class="umaDiv" id="theSets">
+						<select id="setSelect" class="selectIds">
+							<option value="1">Set 1</option>
+							<option value="2">Set 2</option>
+							<option value="3">Set 3</option>
+							<option value="4">Set 4</option>
+							<option value="5">Set 5</option>
+							<option value="6">Set 6</option>
+							<option value="7">Set 7</option>
+							<option value="8">Set 8</option>
+							<option value="9">Set 9</option>
+						</select>
+						<!-- Playlist Mode -->
+						<input type="button" id="playlistBtn" value="Playlist Mode: OFF" class="PUTAQUEPARIU" title="Clique aqui para ativar o modo playlist" onclick="playlistMode();">
+						<!-- Load Set From File -->
+						<input id="loadSetFromFileBtn" value="Aplicar Set" onclick="triggerLoadSetFromFile();" type="button" title="Clique aqui para carregar um set inteiro através de um arquivo" class="btnSet" style="width: 80px;">
+						<!-- Save Set From File -->
+						<input id="saveSetFromFileBtn" value="Salvar Set" onclick="$saveInFile = true;saveSettings();" type="button" title="Clique aqui para guardar o set atual em um arquivo" class="btnSet" style="width: 80px;">
+						<!-- Batch Load -->
+						<input id="batchLoadBtn" value="Batch Load" onclick="triggerBatchLoad();" type="button" title="Clique aqui para adicionar diversas musicas nas tracks" class="btnSet">
+						<!-- FadeOut Button -->
+						<input type="button" id="fadeOutAllBtn" value="Fade Out" class="fadeBtn" title="Clique aqui para executar Fade Out no player" onclick="fadeOutAll();">
+						<!-- FadeIn Button -->
+						<input type="button" id="fadeInAllBtn" value="Fade In" class="fadeBtnDisabled" title="Clique aqui para executar Fade In no player" onclick="fadeInAll();" disabled="disabled">
+						<!-- Fade Master -->
+						<div class="divis">
+							<font title="Fade Master: Controla o Fade In e o Fade Out ao mesmo tempo" class="subTitle">F. Master: <font id="fadeMasterText">2000</font>ms</font><br/>
+							<input id="fadeInMaster" oninput="updateFadeMaster();" type="range" step="20" min="20" max="10000" value="2500">
+						</div>
+						<!-- Fade Out -->
+						<div class="divis">
+							<font title="Controla o volume de saída da música" class="subTitle">Fade Out: <font id="fadeOuText">2000</font>ms</font><br/>
+							<input id="fadeOutRange" oninput="updateFadeRange(2);" type="range" step="20" min="20" max="10000" value="2500">
+						</div>
+						<!-- Fade In -->
+						<div class="divis">
+							<font title="Controla o volume de entrada da música" class="subTitle">Fade In: <font id="fadeInText">2000</font>ms</font>
+							<br/>
+							<input id="fadeInRange" oninput="updateFadeRange(1);" type="range" step="20" min="20" max="10000" value="2500">
+						</div>
+						<!-- Velocidade de reprodução -->
+						<div class="divis">
+							<font title="Controla a Velocidade de reprodução da música" class="subTitle">Velocidade: <font id="playbackSpeedText">1</font>x</font><br/>
+							<input id="playbackSpeed" oninput="changePlaybackSpeed();" type="range" step="0.1" min="0.1" max="10" value="1">
+						</div>
+						<!-- Configs -->
+						<input id="showCfgBtn" value="Configurações" onclick="animSettings(1);" type="button" title="Clique aqui para Mostrar as Configurações do MythDeck" class="btnSet">
+					</div>
+				</div>
+				<!-- VUs & Spectrum -->
+				<div id="vusDiv" class="theVuHolder">
+					<!-- Track A -->
+					<div class="vuHolderBlackLeft" id="vuA">
+						<font class="vuText">Player A: </font>
+						<div id="trackAVU" class="micCanvas">
+							<canvas id="track1Canvas" class="canvasPlayers"></canvas>
+						</div>
+					</div>
+					<!-- Microfone -->
+					<div class="vuHolderBlackMiddle" id="wsVU">
+						<font class="vuText" title="Onda sonora do mic principal">Mic: </font>
+						<div id="micVU" class="micCanvas">
+							<!-- WaveSurfer vai fazer suas capirotagens aqui -->
+						</div>
+					</div>
+					<!-- Track B -->
+					<div class="vuHolderBlackRight" id="vuB">
+						<font class="vuText">Player B: </font>
+						<div id="trackBVU" class="micCanvas">
+							<canvas id="track2Canvas" class="canvasPlayers"></canvas>
+						</div>
+					</div>
+				</div>
+				<!-- Transições -->
+				<div id="trans1" class="transition">
+					<p class="p" align="left">
+						<input type="button" id="minTrans01" class="minBtn" value="-" onclick="minTrans(1);">
+						<input type="button" id="maxTrans01" disabled="disabled" class="minBtn" value="+" onclick="maxTrans(1);">
+						<font class="subTitle">Transição Atual: <font class="transText" id="textCurrentTrans">Nenhum arquivo foi selecionado</font></font>
+					</p>
+					<div id="transContent1" style="padding-top: 4px;">
+						<!-- Transição 1 -->
+						<p class="p" align="left">
+							<font class="subTitle">Transição 1: <font class="transText" id="textCurrentTrans1">Nenhum arquivo foi selecionado</font></font>
+						</p>
+						<input type="button" value="8" class="largeBtnLabel" disabled="disabled"/>
+						<input type="button" value="Escolher arquivo" onclick="triggerTrans(1);" class="loadBtn" title="Clique aqui para adicionar uma nova transição"/>
+						<input type="text" disabled="disabled" id="transLabel1" value="Nenhum arquivo foi selecionado" class="textTrans">
+						<audio controls id="audioTrans1"></audio>
+						<div class="transVolume">
+							<font class="subTitle">Volume: <font class="transText" id="transVolumeLabel1">0.5</font></font>
+							<input type="range" class="margin volumeSlider" oninput="changeTransVolume(1);" id="transVolume1" step="0.01" min="0" max="1" value="0.5">
+						</div>
+						<!-- Transição 2 -->
+						<p class="p" align="left">
+							<font class="subTitle">Transição 2: <font class="transText" id="textCurrentTrans2">Nenhum arquivo foi selecionado</font></font>
+						</p>
+						<div id="transContent2">
+							<input type="button" value="9" class="largeBtnLabel" disabled="disabled"/>
+							<input type="button" value="Escolher arquivo" onclick="triggerTrans(2);" class="loadBtn" title="Clique aqui para adicionar uma nova transição"/>
+							<input type="text" disabled="disabled" id="transLabel2" value="Nenhum arquivo foi selecionado" class="textTrans">
+							<audio controls id="audioTrans2"></audio>
+							<div class="transVolume">
+								<font class="subTitle">Volume: <font class="transText" id="transVolumeLabel2">0.5</font></font>
+								<input type="range" class="margin volumeSlider" oninput="changeTransVolume(2);" id="transVolume2" step="0.01" min="0" max="1" value="0.5">
+							</div>
+						</div>
+						<!-- Transição 3 -->
+						<p class="p" align="left">
+							<font class="subTitle">Transição 3: <font class="transText" id="textCurrentTrans3">Nenhum arquivo foi selecionado</font></font>
+						</p>
+						<div id="transContent3">
+							<input type="button" value="0" class="largeBtnLabel" disabled="disabled"/>
+							<input type="button" value="Escolher arquivo" onclick="triggerTrans(3);" class="loadBtn" title="Clique aqui para adicionar uma nova transição"/>
+							<input type="text" disabled="disabled" id="transLabel3" value="Nenhum arquivo foi selecionado" class="textTrans">
+							<audio controls id="audioTrans3"></audio>
+							<div class="transVolume">
+								<font class="subTitle">Volume: <font class="transText" id="transVolumeLabel3">0.5</font></font>
+								<input type="range" class="margin volumeSlider" oninput="changeTransVolume(3);" id="transVolume3" step="0.01" min="0" max="1" value="0.5">
+							</div>
+						</div>
+						<!-- Transição 4 -->
+						<p class="p" align="left">
+							<font class="subTitle">Transição 4: <font class="transText" id="textCurrentTrans4">Nenhum arquivo foi selecionado</font></font>
+						</p>
+						<div id="transContent4">
+							<input type="button" value="-" class="largeBtnLabel" disabled="disabled"/>
+							<input type="button" value="Escolher arquivo" onclick="triggerTrans(4);" class="loadBtn" title="Clique aqui para adicionar uma nova transição"/>
+							<input type="text" disabled="disabled" id="transLabel4" value="Nenhum arquivo foi selecionado" class="textTrans">
+							<audio controls id="audioTrans4"></audio>
+							<div class="transVolume">
+								<font class="subTitle">Volume: <font class="transText" id="transVolumeLabel4">0.5</font></font>
+								<input type="range" class="margin volumeSlider" oninput="changeTransVolume(4);" id="transVolume4" step="0.01" min="0" max="1" value="0.5">
+							</div>
+						</div>
+						<!-- Transição 5 -->
+						<p class="p" align="left">
+							<font class="subTitle">Transição 5: <font class="transText" id="textCurrentTrans5">Nenhum arquivo foi selecionado</font></font>
+						</p>
+						<div id="transContent5">
+							<input type="button" value="+" class="largeBtnLabel" disabled="disabled"/>
+							<input type="button" value="Escolher arquivo" onclick="triggerTrans(5);" class="loadBtn" title="Clique aqui para adicionar uma nova transição"/>
+							<input type="text" disabled="disabled" id="transLabel5" value="Nenhum arquivo foi selecionado" class="textTrans">
+							<audio controls id="audioTrans5"></audio>
+							<div class="transVolume">
+								<font class="subTitle">Volume: <font class="transText" id="transVolumeLabel5">0.5</font></font>
+								<input type="range" class="margin volumeSlider" oninput="changeTransVolume(5);" id="transVolume5" step="0.01" min="0" max="1" value="0.5">
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Seleção de tracks -->
+				<div class="divFinal" id="divFinal">
+						<!-- Labels -->
+						<div class="lblTrackHelper">
+							<div class="descLBL-ID">ID</div>
+							<div class="descLBL-COMANDOS">Comandos</div>
+							<div class="descLBL-TRACKS">Nome das tracks</div>
+							<div class="descLBL-VCUSTOM">Volume Custom</div>
+						</div>
+						<!-- musica 1 -->
+						<div class="itemList" id="m1">
+							<input type="button" value="1" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(1);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(1);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(1);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(1);" id="loadFileToTrack1" title="Clique aqui para adicionar um arquivo a track 1">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl1" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz1" onclick="enableVz(1);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(1);" id="vz1" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 2 -->
+						<div class="itemList" id="m2">
+							<input type="button" value="2" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(2);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(2);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(2);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(2);" id="loadFileToTrack2" title="Clique aqui para adicionar um arquivo a track 2">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl2" class="lbl">
+							<input type="checkbox" id="chkVz2" onclick="enableVz(2);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(2);" id="vz2" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 3 -->
+						<div class="itemList" id="m3">
+							<input type="button" value="3" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(3);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(3);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(3);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(3);" id="loadFileToTrack3" title="Clique aqui para adicionar um arquivo a track 3">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl3" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz3" onclick="enableVz(3);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(3);" id="vz3" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 4 -->
+						<div class="itemList" id="m4">
+							<input type="button" value="4" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(4);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(4);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(4);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(4);" id="loadFileToTrack4" title="Clique aqui para adicionar um arquivo a track 4">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl4" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz4" onclick="enableVz(4);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(4);" id="vz4" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 5 -->
+						<div class="itemList" id="m5">
+							<input type="button" value="5" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(5);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(5);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(5);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(5);" id="loadFileToTrack5" title="Clique aqui para adicionar um arquivo a track 5">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl5" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz5" onclick="enableVz(5);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(5);" id="vz5" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 6 -->
+						<div class="itemList" id="m6">
+							<input type="button" value="6" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(6);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(6);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(6);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(6);" id="loadFileToTrack6" title="Clique aqui para adicionar um arquivo a track 6">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl6" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz6" onclick="enableVz(6);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(6);" id="vz6" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+						<!-- musica 7 -->
+						<div class="itemList" id="m7">
+							<input type="button" value="7" disabled="disabled" class="btnLabel">
+							<input type="button" value="V" onclick="aplVolTrack(7);" title="Clique aqui para aplicar o volume do player nessa track">
+							<input type="button" value="X" onclick="excluirTrack(7);" title="Clique aqui para excluir a trilha dessa track">
+							<input type="button" value="P" onclick="customPreferences(7);" title="Clique aqui para ver as opções personalizadas para essa track">
+							<input type="button" value="Escolher arquivo" onclick="triggerTrack(7);" id="loadFileToTrack7" title="Clique aqui para adicionar um arquivo a track 7">
+							<input type="text" readonly="readonly" unselectable="on" disabled="diasbled" value="Nenhum arquivo foi selecionado" id="lbl7" class="lbl">
+							<input type="checkbox" class="ch" id="chkVz7" onclick="enableVz(7);" title="Clique para ativar/desativar o volume dessa track">
+							<input type="range" class="volumeSlider" oninput="updateVolFinalRange(7);" id="vz7" step="0.01" min="0" max="1" value="0.5" title="Volume Individual">
+						</div>
+				</div>
+			</div>
+			<!-- Parametros de Track -->
+			<div id="trackParameter" class="parameterTracks">
+				<font class="currentTrack">Configurações Personalizadas</font><br/>
+				<font class="subTitle">Track ID: <font id="trackIdCurrent">???</font> - </font>
+				<font class="subTitle">Nome: <font id="trackName">???</font></font><br/>
+				<div class="parameterHolder" id="parameterHolderDiv">
+					<!-- Loop Personalizado -->
+					<input type="checkbox" id="checkboxCustomLoop" onclick="onCheckPerson();">
+					<font class="subTitle">Habilitar loop personalizado</font><input type="button" class="btnHelp" value="?" title="Clique aqui para obter ajuda sobre essa opção" onclick="helpBtn(1);"><br/>
+					<div id="settings1" style="display: inline;">
+						<font class="subTitle" title="(Métrica: Segundos.milésimos)">Tempo atual: <font id="currentTimeForProgram">???</font></font><br/>
+						<font class="subTitle">Tempo minimo: </font>
+						<input type="number" onkeypress="eLaVamosNos(event, 1);" title="Insira aqui o tempo inicial do loop (Pressione enter para testar)" class="inputNumber" id="minTimeProgram" onchange="checkInpuNumber(1);checkCTime();" value="0" step="0.001">
+						<input type="button" value="Usar Tempo Atual" class="btnSmallLeft" onclick="getCurrentTime(1);" title="Clique aqui para usar o tempo atual"><br/>
+						<font class="subTitle">Tempo maximo: </font>
+						<input type="number" onkeypress="eLaVamosNos(event, 2);" title="Insira aqui o tempo final para acontecer o loop (Pressione enter para testar)" class="inputNumber" id="maxTimeProgram" onchange="checkInpuNumber(2);checkCTime();" value="0" step="0.001">
+						<input type="button" value="Usar Tempo Atual" class="btnSmallLeft" onclick="getCurrentTime(2);" title="Clique aqui para usar o tempo atual"><br/>
+						<font class="subTitle" title="Métrica: ms">Tempo de fusão: </font>
+						<input type="number" id="fadeInOutCustom" class="inputNumber" oninput="updateFusionTime(currentTrackPersonSet);" min="1" max="5000" step="1" value="1000"><input type="button" class="btnSmallLeft" value="Usar valor padrão" onclick="resetFusionTime();"><br/>
+						<input type="button" value="Testar Efeito" class="btnSmall" onclick="testEffectCustomLoop();" title="Clique aqui para testar o loop">
+						<font class="subTitle" style="margin-left: 2px;"> - Ao clicar nesse botão, a música irá tocar a partir do tempo final com a diferença de quatro segundos.</font>
+					</div>
+					<div class="espacador"></div>
+					<font class="subTitle">Volume de Fade Out Personalizado</font><input type="button" class="btnHelp" value="?" title="Clique aqui para obter ajuda sobre essa opção" onclick="helpBtn(2);"><br/>
+					<div id="settings2">
+						<input type="range" class="customSlider" oninput="updateCustomFadeOut();" id="fadeoutCustom" min="0.01" max="0.12" step="0.01" value="0.08">
+						<font class="subTitle">Volume: <font id="customVolumeSliderLbl">???</font></font><br/>
+						<input type="button" class="btnSmall" title="Clique aqui para usar o volume atual (O volume não pode ser maior que 0.12)" value="Usar volume atual" onclick="useCurrentVolume();">
+						<input type="button" class="btnSmall" title="Clique aqui para usar o volume padrão (0.08)" value="Resetar Volume" onclick="resetCustomFadeOut();">
+					</div>
+					<div class="espacador"></div>
+					<input type="checkbox" id="checkboxTrackLoop" onclick="onCheckNormalLoop();">
+					<font class="subTitle">Loop Comum</font>
+					<input type="button" class="btnHelp" value="?" title="Clique aqui para obter ajuda sobre essa opção" onclick="helpBtn(3);"><br/>
+					<font class="subTitle">Ative essa opção para que essa track fique tocando repetidamente independente de qualquer loop personalizado.</font><br>
+					<div class="espacador"></div>
+					<!-- Espaço para futuras implementações -->
+				</div>
+				<input type="button" value="Aplicar e Sair" onclick="animSettings(6);" class="btn" title="Clique aqui para salvar as suas configurações e sair">
+			</div>
+			<!-- Configs -->
+			<div id="configsDiv" class="menu divComum" style="height: auto;">
+				<font class="currentTrack">Configurações</font>
+					<p align="left" class="settingsChecklist">
+						<!-- Habilitar WaveSurfer.js -->
+						<input type="checkbox" id="cfgEnableWaveJs" title="Marque essa caixa habilitar o uso do plugin WaveSurfer.js" onclick="checkboxUseWaveJs();">
+						<font class="subTitle" title="Esse plugin ajuda a monitorar o VU do seu microfone" style="margin-left: 3px;">Habilitar plugin WaveSurfer.js (Precisa reinciar)</font><br/>
+						<!-- Escrever o nome da música em arquivo .txt -->
+						<input type="checkbox" id="cfgEnableMusicTxtCompat" title="Esse modo ajuda a pegar os metadados das músicas escrevendo o nome da música em um arquivo de texto" onclick="checkboxMusicOnTxtCompat();">
+						<font class="subTitle" id="lblEnableMusicTxtCompat" title="Esse modo ajuda a pegar os metadados das músicas escrevendo o nome da música em um arquivo de texto" style="margin-left: 3px;">Habilitar nome da música em .txt (Arquivo: MusicaAtual.txt)</font><br/>
+						<!-- Habilitar Modo de compatibilidade com o rocket broadcaster -->
+						<input type="checkbox" id="cfgEnableTitleCompat" title="Esse modo ajuda a pegar os metadados das músicas alterando a barra de título" onclick="checkboxRocketBroadcasterCompat();">
+						<font class="subTitle" id="lblEnableTitleCompat" title="Esse modo ajuda a pegar os metadados das músicas alterando a barra de título" style="margin-left: 3px;">Habilitar modo de compatibilidade de título (Para quem usa o Rocket Broadcaster Versão Free)</font><br/>
+						<!-- Habilitar Notificações -->
+						<input type="checkbox" id="cfgEnableNotify" title="Sempre que o player for tocar uma música nova, ele irá criar uma notificação na área de trabalho" onclick="checkboxNotify();">
+						<font class="subTitle" id="lblEnablenotify" title="Sempre que o player for tocar uma música nova, ele irá criar uma notificação na área de trabalho" style="margin-left: 3px;">Habilitar Notificações</font><br/>
+						<!-- Precarregar Músicas -->
+						<input type="checkbox" id="cfgPreloadSet" title="Assim que o MythDeck for recarregado ou iniciado, ele irá carregar suas configurações automáticamente" onclick="enableLoadSet();">
+						<font class="subTitle" id="labelPreloadSet" style="margin-left: 3px;display: none;">Carregar set - 
+							<select id="setLoad" class="setLoad">
+								<option value="1">Set 1</option>
+								<option value="2">Set 2</option>
+								<option value="3">Set 3</option>
+								<option value="4">Set 4</option>
+								<option value="5">Set 5</option>
+								<option value="6">Set 6</option>
+								<option value="7">Set 7</option>
+								<option value="8">Set 8</option>
+								<option value="9">Set 9</option>
+							</select>
+							Será carregado automáticamente quando o programa for inicializado ou reiniciado.
+						</font>
+						<font class="subTitle" id="labelPreloadSetInicial" title="Assim que o MythDeck for recarregado ou iniciado, ele irá carregar suas músicas e configurações automáticamente" style="margin-left: 3px;">Pré-Carregar set de tracks ao iniciar</font><br/>
+						<!-- Fade entre tracks -->
+						<input type="checkbox" id="fadeTracksCheckbox" onclick="enableFadeTracks();" title="Clique aqui para habilitar o fade entre as tracks">
+						<font class="subTitle" id="LabelFadeTracksInfo" style="display: none;margin-left: 3px;">Fade entre Tracks - Executar quando estiver faltando  
+						<input type="range" class="adjustRange" disabled="disabled" oninput="updateFadeTracks();" id="fadeTracksRange" min="1" max="10" step="1" value="1" title="Fade entre as tracks" style="display: none;">
+						<font class="subTitle" id="LabelFadeTracksNumber" style="display: none;">???</font> Segundo(s) para a música terminar</font>
+						<font class="subTitle" id="LabelFadeTracks" style="margin-left: 3px;">Habilitar Fade Entre as Tracks</font>
+					</p>
+				<br>
+				<!-- Carregar Configs -->
+				<input id="loadBtn" value="Carregar Configs" onclick="loadSettings(1);" type="button" title="Clique aqui para carregar as configurações do set atual" class="btn">
+				<!-- Salvar Configs -->
+				<input id="saveBtn" value="Guardar Configs" onclick="saveSettings(1);" type="button" title="Clique aqui para salvar as configurações do set atual" class="btn">
+				<!-- Configurar Teclas -->
+				<input id="saveBtn" value="Configurar Teclado" onclick="animSettings(3);" type="button" title="Clique aqui para configurar os comandos de teclado" class="btn">
+				<!-- Remover Configs -->
+				<input id="deleteBtn" value="Deletar Configs" onclick="warnDel();" type="button" title="Clique aqui para deletar todas as configurações" class="redBtn">
+				<!-- Recarregar Pagina -->
+				<input id="reloadBtn" value="Recarregar App" onclick="reload();" type="button" title="Clique aqui para recarregar o aplicativo" class="btn">
+				<br>
+				<!-- Ajuda -->
+				<input id="helpBtn" value="Ajuda" onclick="showHelp(1);" type="button" title="Clique aqui para abrir o menu de ajuda" class="btn">
+				<!-- Sobre o MythDeck -->
+				<input id="aboutMythBtn" value="Sobre o MythDeck" onclick="aboutMyth();" type="button" class="btn">
+				<!-- Browser Via Iframe -->
+				<input id="showBrowser" value="iFrame Browser" onclick="animSettings(7);" type="button" class="btn">
+				<!-- Voltar -->
+				<input id="reloadBtn" value="Voltar" onclick="animSettings(2);" type="button" title="Clique aqui para voltar" class="btn">
+			</div>
+			<!-- Aviso de deletar configs -->
+			<div id="warnForm" class="devil">
+				<font class="currentTrack sure">Você tem certeza disso?</font><br/>
+				<input type="button" title="Clique aqui para voltar ao menu de configurações" class="btn" onclick="backToSettings(1);" value="Não">
+				<input type="button" title="CUIDADO: Uma vez que você deletar não será possível recuperar as informações perdidas!" class="redBtn" onclick="deleteSettings();" value="Sim">
+			</div>
+			<!-- Configurar Teclas -->
+			<div id="keyConfigs" class="keySettings">
+				<font class="currentTrack" id="keySetttingsTitle">Configurações de Teclado</font><br>
+				<font class="subTitle" style="display: none;" id="keyWaitLBL">...Pressione alguma tecla para continuar...</font>
+				<div id="keyHolder" class="keyHold">
+					<font class="keyTitle">Tracks</font>
+					<!-- Tocar Track 1 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(1);">
+						<font class="subTitle">Tocar Track 1 - Tecla '<font id="lblPlayTrack1">1</font>'</font>
+					</div>
+					<!-- Tocar Track 2 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(2);">
+						<font class="subTitle">Tocar Track 2 - Tecla '<font id="lblPlayTrack2">2</font>'</font>
+					</div>
+					<!-- Tocar Track 3 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(3);">
+						<font class="subTitle">Tocar Track 3 - Tecla '<font id="lblPlayTrack3">3</font>'</font>
+					</div>
+					<!-- Tocar Track 4 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(4);">
+						<font class="subTitle">Tocar Track 4 - Tecla '<font id="lblPlayTrack4">4</font>'</font>
+					</div>
+					<!-- Tocar Track 5 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(5);">
+						<font class="subTitle">Tocar Track 5 - Tecla '<font id="lblPlayTrack5">5</font>'</font>
+					</div>
+					<!-- Tocar Track 6 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(6);">
+						<font class="subTitle">Tocar Track 6 - Tecla '<font id="lblPlayTrack6">6</font>'</font>
+					</div>
+					<!-- Tocar Track 7 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(7);">
+						<font class="subTitle">Tocar Track 7 - Tecla '<font id="lblPlayTrack7">7</font>'</font>
+					</div>
+					<!-- Transições -->
+					<font class="keyTitle">Transições</font>
+					<!-- Tocar Transição 1 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(8);">
+						<font class="subTitle">Tocar Transição 1 - Tecla '<font id="lblPlayTrans1">8</font>'</font>
+					</div>
+					<!-- Tocar Transição 2 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(9);">
+						<font class="subTitle">Tocar Transição 2 - Tecla '<font id="lblPlayTrans2">9</font>'</font>
+					</div>
+					<!-- Tocar Transição 3 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(10);">
+						<font class="subTitle">Tocar Transição 3 - Tecla '<font id="lblPlayTrans3">0</font>'</font>
+					</div>
+					<!-- Tocar Transição 4 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(11);">
+						<font class="subTitle">Tocar Transição 4 - Tecla '<font id="lblPlayTrans4">-</font>'</font>
+					</div>
+					<!-- Tocar Transição 5 -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(12);">
+						<font class="subTitle">Tocar Transição 5 - Tecla '<font id="lblPlayTrans5">=</font>'</font>
+					</div>
+					<!-- Player -->
+					<font class="keyTitle">Player</font>
+					<!-- Pausar Player -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(13);">
+						<font class="subTitle">Pausar Player - Tecla '<font id="lblPauseTrack">Espaço</font>'</font>
+					</div>
+					<!-- Parar Transição -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(14);">
+						<font class="subTitle">Parar Transição - Tecla '<font id="lblStopTrans">Enter</font>'</font>
+					</div>
+					<!-- Aumentar Volume -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(15);">
+						<font class="subTitle">Aumentar Volume - Tecla '<font id="lblVolUp">W</font>'</font>
+					</div>
+					<!-- Diminuir Volume -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(16);">
+						<font class="subTitle">Diminuir Volume - Tecla '<font id="lblVolDown">Q</font>'</font>
+					</div>
+					<!-- Toggle Playlist -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(17);">
+						<font class="subTitle">Playlist Mode - Tecla '<font id="lblPlaylistMode">P</font>'</font>
+					</div>
+					<!-- Avançar tempo na Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(18);">
+						<font class="subTitle">Avançar tempo na musica atual - Tecla '<font id="lblSeekForward">B</font>'</font>
+					</div>
+					<!-- Voltar tempo na Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(19);">
+						<font class="subTitle">Voltar tempo na musica atual - Tecla '<font id="lblSeekBackwards">V</font>'</font>
+					</div>
+					<!-- Mutar Player -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(20);">
+						<font class="subTitle">Mutar Player - Tecla '<font id="lblMutePlayer">M</font>'</font>
+					</div>
+					<!-- Mutar Transição -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(21);">
+						<font class="subTitle">Mutar Transição - Tecla '<font id="lblMuteTrans">N</font>'</font>
+					</div>
+					<!-- Habilitar Volume da Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(22);">
+						<font class="subTitle">Habilitar Volume da Track - Tecla '<font id="lblEnableVolumeTrack">C</font>'</font>
+					</div>
+					<!-- Aumentar Velocidade da Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(23);">
+						<font class="subTitle">Aumentar Velocidade da Track - Tecla '<font id="lblSpeedUp">/</font>'</font>
+					</div>
+					<!-- Diminuir Velocidade da Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(24);">
+						<font class="subTitle">Diminuir Velocidade da Track - Tecla '<font id="lblSpeedDown">;</font>'</font>
+					</div>
+					<!-- Resetar Velocidade da Track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(25);">
+						<font class="subTitle">Resetar Velocidade da Track - Tecla '<font id="lblResetSpeed">]</font>'</font>
+					</div>
+					<!-- Aplicar Volume na track -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(37);">
+						<font class="subTitle">Aplicar Volume na track - Tecla '<font id="lblAplVolTrack">\</font>'</font>
+					</div>
+					<!-- Faders -->
+					<font class="keyTitle">Faders</font>
+					<!-- Aumentar Fader Master -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(26);">
+						<font class="subTitle">Aumentar Fader Master - Tecla '<font id="lblFadeMasterIn">.</font>'</font>
+					</div>
+					<!-- Diminuir Fader Master -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(27);">
+						<font class="subTitle">Diminuir Fader Master - Tecla '<font id="lblFadeMasterOut">,</font>'</font>
+					</div>
+					<!-- Aplicar Fade In Master -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(28);">
+						<font class="subTitle">Aplicar Fade In - Tecla '<font id="lblApplyFadeIn">X</font>'</font>
+					</div>
+					<!-- Aplicar Fade Out Master -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(29);">
+						<font class="subTitle">Aplicar Fade Out - Tecla '<font id="lblApplyFadeOut">Z</font>'</font>
+					</div>
+					<!-- Interface -->
+					<font class="keyTitle">Interface</font>
+					<!-- Mostrar Transições -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(30);">
+						<font class="subTitle">Mostrar Transições - Tecla '<font id="lblShowTrans">G</font>'</font>
+					</div>
+					<!-- Esconder Transições -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(31);">
+						<font class="subTitle">Esconder Transições - Tecla '<font id="lblHideTrans">H</font>'</font>
+					</div>
+					<!-- Reiniciar Programa -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(32);">
+						<font class="subTitle">Reiniciar Programa - Tecla '<font id="lblReboot">R</font>'</font>
+					</div>
+					<!-- Salvar, Carregar & Sets -->
+					<font class="keyTitle">Salvar, Carregar & Sets</font>
+					<!-- Salvar Set & Configurações -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(33);">
+						<font class="subTitle">Salvar Set & Configurações - Tecla '<font id="lblSaveConfigs">S</font>'</font>
+					</div>
+					<!-- Carregar Set & Configurações -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(34);">
+						<font class="subTitle">Carregar Set & Configurações - Tecla '<font id="lblLoadConfigs">L</font>'</font>
+					</div>
+					<!-- Avançar Set -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(35);">
+						<font class="subTitle">Avançar Set - Tecla '<font id="lblNextSet">D</font>'</font>
+					</div>
+					<!-- Voltar Set -->
+					<div class="keyConfig">
+						<input type="button" value="Atribuir Tecla" class="keyAssignBtn" onclick="getKey(36);">
+						<font class="subTitle">Voltar Set - Tecla '<font id="lblPreviousSet">A</font>'</font>
+					</div>
+				</div>
+				<input type="button" id="btnSetKeyReset" value="Resetar Teclas" class="btn" onclick="resetKeys();">
+				<input type="button" id="btnSaveKeysCfg" value="Salvar" class="btn" onclick="generateKeysConfigFile();">
+				<input type="button" id="btnLoadKeysCfg" value="Carregar" class="btn" onclick="triggerLoadKeysCfg();">
+				<input type="button" id="btnSetKeyBack" value="Voltar" class="btn" onclick="animSettings(4);">
+			</div>
+			<!-- Ajuda -->
+			<div id="helpForm" class="helpDiv">
+				<center>
+					<font class="currentTrack">Ajuda</font>
+					<div id="helpContents" class="helpContents">
+						<font class="subTitle">
+							<center><h1>Atalhos de Teclado</h1></center>
+							<b>1, 2, 3, 4, 5, 6 ou 7</b> - Iniciar Tracks<br/>
+							<b>8, 9, 0, - ou =</b> - Iniciar Transição<br/>
+							<b>M</b> - Mutar Player<br/>
+							<b>P</b> - Liga/Desliga Playlist Mode<br/>
+							<b>Z</b> - Diminui o volume do player com efeito Fade Out<br/>
+							<b>X</b> - Aumenta o volume do player com efeito Fade In<br/>
+							<b>C</b> - Ativa/Desativa volume da track<br/>
+							<b>H</b> - Esconder menu de Transições<br/>
+							<b>G</b> - Mostrar menu de Transições<br/>
+							<b>L</b> - Carregar Configs/Sets<br/>
+							<b>S</b> - Guardar Configs/Sets<br/>
+							<b>R</b> - Reinicia o MythDeck<br/>
+							<b>Q, W</b> - Aumentar/Diminuir Volume<br/>
+							<b>A, D</b> - Alternar entre Sets<br/>
+							<b>; ou /</b> - Aumentar/Diminuir Velocidade de reprodução<br/>
+							<b>]</b> - Define a velocidade de reprodução para 1 (velocidade normal)<br/>
+							<b>, ou .</b> - Aumentar/Diminuir tempo de Fade In/Out<br/>
+							<center><h1>Iniciando as Tracks</h1></center>
+							Para tocar uma música, basta clicar no botão "Escolher arquivo" de algum slot na parte inferior do menu principal.<br/>
+							<center><img src="img/help1.png" class="helpImg"></center>
+							Assim que você escolher o arquivo, basta apertar a tecla correspondente no seu teclado para iniciar a mesma. Se você quiser carregar diversos arquivos de uma vez, clique em "Batch Load" e selecione os arquivos desejados.
+							Para alternar entre as trilhas, certifique de ter adicionado outras músicas nos slots e pressione a tecla correspondente da trilha desejada. Caso você não selecione nenhuma track, o MythDeck vai continuar a tocar a track atual em loop. Você também pode atribuir um volume personalizado para cada track que você adicionar ao deck manipulando o fader em frente de cada slot.
+							<center><h1>Menu de Fades, Set e Velocidade</h1></center>
+							Você pode alternar tando a velocidade de reprodução das trilhas, Set atual ou como também aplicar fades com o tempo que você quiser no menu principal.<br/> 
+							<center><img src="img/help2.png" class="helpImg"></center>
+							<b>Set (Número)</b> - Seleciona o Set de músicas<br/>
+							<b>Playlist Mode</b> - Liga ou desliga o modo "Playlist Mode"<br/>
+							<b>Batch Load</b> - Carrega o as tracks com diversas músicas ao mesmo tempo<br/>
+							<b>(Botão) Fade Out</b> - Aplica o Efeito Fade Out na track atual deixando o volume quase mudo<br/>
+							<b>(Botão) Fade In</b> - Restaura o volume da track atual<br/>
+							<b>F. Master</b> - Manipula os Faders "Fade In" e "Fade Out" ao mesmo tempo<br/>
+							<b>Fade In</b> - Fader que controla a velocidade da entrada da próxima track.<br/> 
+							<b>Fade Out</b> - Fader que controla a velocidade que a música atual é silenciada<br/>
+							<b>Velocidade</b> - Fader que controla a velocidade de reprodução da track atual<br/>
+							<b>Configurações</b> - Sério que eu preciso dizer o que esse botão faz?<br/>
+							<center><h1>Transições</h1>
+							<img src="img/help3.png" class="helpImg"></center>
+							O MythDeck tem um menu exclusivo para efeitos sonoros e transições que pode ser usado a qualquer momento sem interromper a trilha principal. Para carregar algum efeito sonoro, basta escolher um slot e clicar em "Escolher Arquivo". <br/>Para usar, basta pressionar as teclas <b>8</b>, <b>9</b>, <b>0</b>, <b>-</b> ou <b>=</b> para executar. 
+							<center><h1>Playlist Mode</h1></center>
+							Para ativar esse modo, basta clicar em "Playlist Mode" ou apertar a tecla "P" do seu teclado.
+							Assim que você ativar esse modo e iniciar a primeira track, ele vai tocar todas as tracks em ordem numérica do deck. Para tornar as coisas mais interessantes, você pode iniciar a próxima track quando a atual estiver chegando ao fim com a função "Fade entre as Tracks". Assim que a ultima track terminar de tocar, o MythDeck apresentará a mensagem: "Playlist Concluída".
+							<center><h1>Fade Entre as Tracks</h1></center>
+							Para habilitar essa função, basta ir em "Configurações" e clicar em "Habilitar Fade Entre Tracks".<br/>
+							Você pode escolher quando estiver faltando até 10 segundos para a trilha terminar para então o MythDeck Carregar a próxima trilha. 
+							<br/><br/>A velocidade que o fade será executado pode ser alterado no menu de F.Master/Fade In/Fade out na pagina inicial.
+							<br/>
+							<b>Importante</b>: Para executar essa função, o MythDeck tem que está com o modo "Playlist Mode" ativo.
+							<center><h1>Carregar/Guardar Configurações</h1></center>
+							Para carregar as suas configurações e sets, basta ir em "Configurações" e clicar em "Carregar Configs".<br/>
+							Caso você tenha guardado mais de uma setlist, você pode carregar a mesma alterando o set atual no menu principal e cliando novamentem em "Carregar Configs". Você também tem a opção de carregar as suas configurações assim que o programa iniciar em "Configurações", "Pré-Carregar set de tracks ao iniciar".
+							<br><br/>
+							Para guardar as suas configurações, basta ir em "Configurações" e clicar em "Guardar Configs".<br/>
+							O MythDeck consegue armazenar cada set de músicas de forma individual, então preste bem a tensão no menu principal para saber qual set de músicas você está guardando.<br/><br/>
+							<b>INFO</b>: O MythDeck não guarda as configurações e setlists em nenhum arquivo local, apenas na memória interna do node-webkit (Sim, o MythDeck está rodando em um browser!). Tenha em mente que uma vez que você excluir as suas configurações, não será possível recuperar elas a não ser que você configure o MythDeck de forma manual novamente.
+							<br/><br/>
+						</font>
+					</div>
+					<input type="button" title="Clique aqui para voltar ao menu de configurações" class="btn" onclick="showHelp(0);" value="Voltar">
+				</center>
+			</div>
+			<!-- Sobre o MythDeck -->
+			<div id="aboutMythDeck" class="about">
+				<img src="img/logo.png" id="mythLogo" onclick="misci();"><br/>
+				<font class="currentTrack">MythDeck</font><br/>
+				<font class="subTitle">Versão <font id="appVer">???</font> (<font id="nwVer">???</font>)</font><br/>
+				<font class="subTitle" onclick="openLink('http://twitter.com/themitosan');" title="Clique para acessar">Twitter: @themitosan</font>
+				<br/><br/>
+				<font class="subTitle">Bibliotecas Usadas: <font onclick="openLink('https://jquery.com/');">jquery</font>, <font onclick="openLink('https://jqueryui.com/');">jquery-ui</font>, <font onclick="openLink('https://wavesurfer-js.org/');">wavesurfer.js</font>, 
+				<font onclick="openLink('https://wavesurfer-js.org/plugins/microphone.html')">wavesurfer.microphone</font>, <font onclick="openLink('https://www.cssscript.com/audio-visualizer-with-html5-audio-element/')">HTML5_Audio_Visualizer</font>.
+				</font>
+				<br/><br/>
+				<font class="subTitle" title="...Faça um favor a sí mesmo(a) e não olhe os códigos desse aplicativo - obrigado(a)!">"There are no beautiful surfaces without a terrible depth." - Friedrich Nietzsche</font><br/>
+				<font class="subTitle" id="theText" title="Tudo hoje em dia tem um tiquinho de HTML/CSS/JS na sua base!">"Já dizia algum calango por aí: Quantas versões de NWJS você tem instalado no seu PC?" - J.Chiavelli</font>
+				<br/><br/>
+				<input type="button" title="Clique aqui para voltar ao menu de configurações" class="btn" onclick="backToSettings(0);" value="Voltar">
+			</div>
+			<!-- teste -->
+			<div id="internalBrowser" style="display: none;">
+				<div class="browserHolder">
+					<input type="button" class="btn" style="margin-top: 0px;" value="Start Update" onclick="startUpdateBrowser();">
+					<input type="button" class="btn" style="margin-top: 0px;" value="Stop Update" onclick="stopUpdateBrowser();">
+					<input type="button" class="btn" style="margin-top: 0px;" value="R" title="Recarregar" onclick="browser_Rel();">
+					<input type="text" id="brUrl" class="browserUrl" placeholder="http://google.com/" title="Avançar" onfocus="browser_reveal();" onblur="browser_hide();">
+					<input type="button" class="browserGo" value="Ir" title="Carregar página" onclick="browser_GO();">
+					<input type="button" class="btn" style="margin-top: 0px;" value="Voltar" title="Voltar para a interface" onclick="browser_sair();">
+				</div>
+				<div class="browserHolder">
+					<iframe id="brow" class="wbrowser"></iframe>
+				</div>
+			</div>
+		</center>
+		<div style="display: none;">
+			<!-- Músicas -->
+			<input type="file" onchange="updateFileLabel(1);" id="file1" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(2);" id="file2" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(3);" id="file3" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(4);" id="file4" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(5);" id="file5" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(6);" id="file6" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateFileLabel(7);" id="file7" accept=".mp3, .ogg, .wav, .flac"/>
+			<!-- Transições -->
+			<input type="file" onchange="updateTransLabel(1);" id="loadTrans1" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateTransLabel(2);" id="loadTrans2" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateTransLabel(3);" id="loadTrans3" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateTransLabel(4);" id="loadTrans4" accept=".mp3, .ogg, .wav, .flac"/>
+			<input type="file" onchange="updateTransLabel(5);" id="loadTrans5" accept=".mp3, .ogg, .wav, .flac"/>
+			<!-- Outros -->
+			<input type="file" onchange="setFileToLoadSet();" name="loadSetFile" id="loadSetFileDialog" accept=".mdeck"/>
+			<input type="file" onchange="setLoadKeysConfigFile();" name="loadKeysC" id="loadKeysConfigFile" accept=".mdkeys"/>
+			<input type="file" multiple="true" onchange="batchLoad();" name="bload" id="batchLoadFileDialog" accept=".wav, .ogg, .mp3, .flac"/>
+		</div>
+		<script type="text/javascript" src="js/external/audio-visualizer.js"></script>
+	</body>
+</html>

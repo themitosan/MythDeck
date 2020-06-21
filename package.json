@@ -1,0 +1,22 @@
+{
+  "main": "App/index.htm",
+  "name": "MythDeck",
+  "description": "A music deck made with html5 / javascript",
+  "js-flags": "--disable-devtools --disable-web-security --allow-file-access-from-files --allow-file-access",
+  "version": "1.0.0",
+  "keywords": [ "MythDeck", "node-webkit" ],
+  "window": {
+    "title": "MythDeck - Aguarde...",
+    "icon" : "App/img/logo.png",
+    "fullscreen": false,
+    "min_width": 1340,
+    "min_height": 706,
+    "toolbar": false,
+    "frame": true,
+    "width": 1341,
+    "height": 707
+  },
+  "webkit": {
+    "plugin": true
+  }
+}
