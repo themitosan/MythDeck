@@ -1,3 +1,5 @@
+<img src="https://github.com/themitosan/MythDeck/blob/master/App/img/logo.png" width="140" height="140">
+
 # MythDeck
 This is a very old experiment i did a long time ago!
 >90% of this code stinks!
@@ -8,6 +10,6 @@ This is a very old experiment i did a long time ago!
 - Extract the files from this repo on nw.exe folder
 - Run nw.exe
 
-## Important info
+### Important info
 - Use NW.js 0.38.2 for this project - it will run better!
-- I will not update this project. If you want to update it by yourself, create a PR!
+- I will not update this project. If you <i>want</i> to update it by yourself, create a PR!
